@@ -1,0 +1,433 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+name: Serpent2
+file_extensions:
+  - serp
+  - srp
+scope: text.serp
+
+variables:
+  reserved_keys: '(branch|cell|coef|dep|det|div|ene|ftrans|fun|ifc|include|iter nuc|lat|mat|mesh|mix|nest|particle|pin|plot|set|solid|src|strans|surf|therm|thermstoch|tme|trans|transv|transa|utrans|wwgen|wwin)'
+
+  xs_library: '([a-zA-Z]{1,2}-([0-9]{1,3}|nat)|([0-9]{4,5}))(\.[0-9]{2}c)'
+  thermal_library: '([a-zA-Z]{2})([a-zA-Z])([0-9])(\.[0-9]{2}t)'
+
+  surface_operators: '[:-#]'
+
+  number_positive_integer: '[0-9]+'
+  number_positive_general: '([0-9]*\.?[0-9]+(?:[eE]([-+]?[0-9]+))?)'
+  number_general: '(([-+]?[0-9]*\.?[0-9]+)(?:[eE]([-+]?[0-9]+))?)'
+  number_color: '(([0-1]?[0-9]?[0-9])|([2][0-4][0-9])|(25[0-5]))'
+
+  word: '\w+'
+  
+contexts:
+  # The prototype context is prepended to all contexts but those setting
+  # meta_include_prototype: false.
+  prototype:
+    - include: comments
+    - include: find_keyword
+
+  main:
+    # The main context is the initial starting point of our syntax.
+    # Include other contexts from here (or specify them directly).
+    - meta_include_prototype: false
+    - include: comments
+    - include: input_cards
+    #- include: numbers
+    #- include: strings
+    
+  input_cards:
+    - meta_include_prototype: false
+    - match: '(?i)(?=\bbranch\b)'
+      push: branch
+    - match: '(?i)(?=\bcell\b)'
+      push: cell
+    - match: '(?i)(?=\bcoef\b)'
+      push: coef
+    - match: '(?i)(?=\bdep\b)'
+      push: depletion
+    - match: '(?i)(?=\bdet\b)'
+      push: detector
+    - match: '(?i)(?=\bdiv\b)'
+      push: divisor
+    - match: '(?i)(?=\bene\b)'
+      push: energy_grid
+    - match: '(?i)(?=\bftrans\b)'
+      push: transformation_fill
+    - match: '(?i)(?=\bfun\b)'
+      push: function
+    - match: '(?i)(?=\bifc\b)'
+      push: interface
+    - match: '(?i)(?=\binclude\b)'
+      push: include
+    - match: '(?i)(?=\biter nuc\b)'
+      push: critical_density_iteration
+    - match: '(?i)(?=\blat\b)'
+      push: lattice
+    - match: '(?i)(?=\bmat\b)'
+      push: material
+    - match: '(?i)(?=\bmesh\b)'
+      push: plot_mesh
+    - match: '(?i)(?=\bmix\b)'
+      push: mixture
+    - match: '(?i)(?=\bnest\b)'
+      push: nested_universe
+    - match: '(?i)(?=\bparticle\b)'
+      push: particle_geometry
+    - match: '(?i)(?=\bpin\b)'
+      push: pin
+    - match: '(?i)(?=\bplot\b)'
+      push: plot_geometry
+    - match: '(?i)(?=\bsolid\b)'
+      push: irregular_solid
+    - match: '(?i)(?=\bsrc\b)'
+      push: source
+    - match: '(?i)(?=\bstrans\b)'
+      push: transformation_surface
+    - match: '(?i)(?=\bsurf\b)'
+      push: surface
+    - match: '(?i)(?=\bset\b)'
+      push: options
+    - match: '(?i)(?=\btherm\b)'
+      push: thermal_scattering
+    - match: '(?i)(?=\bthermstoch\b)'
+      push: thermal_scattering_stochastic
+    - match: '(?i)(?=\btme\b)'
+      push: time_binning
+    - match: '(?i)(?=\btrans\b)'
+      push: transformation
+    - match: '(?i)(?=\btransv\b)'
+      push: transformation_velocity
+    - match: '(?i)(?=\btransa\b)'
+      push: transformation_acceleration
+    - match: '(?i)(?=\butrans\b)'
+      push: transformation_universe
+    - match: '(?i)(?=\bwwgen\b)'
+      push: importance_map
+    - match: '(?i)(?=\bwwin\b)'
+      push: weight_window
+
+  branch:
+    - meta_scope: keyword.branch.serp
+    - match: '(?i)\b(repm|repu|stp|tra|var)\b'
+      scope: entity.name.function.serp
+  coef:
+    - meta_scope: keyword.coef.serp
+  critical_density_iteration:
+    - meta_scope: keyword.iter_nuc.serp
+  depletion:
+    - meta_scope: keyword.dep.serp
+  divisor:
+    - meta_scope: keyword.div.serp
+  energy_grid:
+    - meta_scope: keyword.ene.serp
+  function:
+    - meta_scope: keyword.fun.serp
+  importance_map:
+    - meta_scope: keyword.wwgen.serp
+  interface:
+    - meta_scope: keyword.ifc.serp
+  include:
+    - meta_scope: keyword.include.serp
+  irregular_solid:
+    - meta_scope: keyword.solid.serp
+     
+  lattice:
+    - meta_scope: keyword.lat.serp
+    - match: '(?i)\blat\s+({{word}})\s+([1-3])\s+\b'
+      captures:
+        1: storage.type.universe.serp
+        2: entity.name.function.square_hexagonal.serp
+    - match: '(?i)\blat\s+({{word}})\s+(4)\s+\b'
+      captures:
+        1: storage.type.universe.serp
+        2: entity.name.function.circular_cluster.serp
+    - match: '(?i)\blat\s+({{word}})\s+([6-8])\s+\b'
+      captures:
+        1: storage.type.universe.serp
+        2: entity.name.function.infinite_3D.serp
+    - match: '(?i)\blat\s+({{word}})\s+(9)\s+\b'
+      captures:
+        1: storage.type.universe.serp
+        2: entity.name.function.vertical_stack.serp
+    - match: '(?i)\blat\s+({{word}})\s+(11)\s+\b'
+      captures:
+        1: storage.type.universe.serp
+        2: entity.name.function.cuboidal_3D.serp
+    - include: numbers
+     
+  mixture:
+    - meta_scope: keyword.mix.serp
+  nested_universe:
+    - meta_scope: keyword.nest.serp
+  particle_geometry:
+    - meta_scope: keyword.particle.serp
+  plot_geometry:
+    - meta_scope: keyword.plot.serp
+  plot_mesh:
+    - meta_scope: keyword.mesh.serp
+  source:
+    - meta_scope: keyword.src.serp
+  thermal_scattering_stochastic:
+    - meta_scope: keyword.thermstoch.serp
+  time_binning:
+    - meta_scope: keyword.tme.serp
+  transformation:
+    - meta_scope: keyword.trans.serp
+  transformation_acceleration:
+    - meta_scope: keyword.transa.serp
+  transformation_fill:
+    - meta_scope: keyword.ftrans.serp
+  transformation_surface:
+    - meta_scope: keyword.strans.serp
+  transformation_universe:
+    - meta_scope: keyword.utrans.serp
+  transformation_velocity:
+    - meta_scope: keyword.transv.serp
+  weight_window:
+    - meta_scope: keyword.wwin.serp
+
+  cell:
+    - meta_scope: keyword.cell.serp
+    - match: '(?i)\bcell\s+({{word}})\s+({{word}})\b'
+      captures:
+        1: storage.type.cell.serp
+        2: storage.type.universe.serp
+    - match: '(?i)\bfill\b'
+      push:
+        - meta_scope: entity.name.function.fill.serp
+        - match: '{{word}}'
+          scope: storage.type.universe.serp
+          pop: true
+    - match: '(?i)\b(outside|void)\b'
+      scope: entity.name.function.serp
+
+  detector:
+    - meta_scope: keyword.det.serp
+    - match: '(?i)\b(dr|dv|dc|du|dm|dl|dx|dy|dz|dn|dh|dumsh|de|di|ds|dir|dtl|df|dt|dhis|dfl|da)\b'
+      scope: entity.name.function.serp
+
+  material:
+    - meta_scope: keyword.mat.serp
+     
+    - match: '(?i)\bmat\s+({{word}})\s+(sum)\b'
+      captures:
+        1: storage.type.material.serp
+        2: entity.name.function.sum.serp
+    - match: '(?i)\bmat\s+({{word}})\s+({{number_general}})\b'
+      captures:
+        1: storage.type.material.serp
+        2: constant.numeric.density.serp
+    - match: '(?i)\btmp\b'
+      push:
+        - meta_scope: entity.name.function.tmp.serp
+        - match: '\b{{number_general}}'
+          pop: true
+          scope: variable.parameter.temperature.serp
+        - include: invalid_not_spaces
+    - match: '(?i)\b(vol|mass)\b'
+      push:
+        - meta_scope: entity.name.function.vol_mass.serp
+        - match: '{{number_general}}'
+          pop: true
+          scope: constant.numeric.volume_mass.serp
+        - include: invalid_not_spaces
+    - match: '(?i)\bmoder\b'
+      push:
+        - meta_scope: entity.name.function.moder.serp
+        - match: '\b({{word}})\s+({{number_positive_integer}})\b'
+          captures:
+            1: support.constant.library_name.serp
+            2: variable.parameter.moderator_nuclide.serp
+          pop: true
+        - include: invalid_not_spaces
+    - match: '(?i)\brgb\b'
+      push:
+        - meta_scope: entity.name.function.rgb.serp
+        - match: '\b({{number_color}}\s+{{number_color}}\s+{{number_color}})\b'
+          scope: variable.parameter.serp
+          pop: true
+        - include: invalid_not_spaces
+    - match: '(?i)\bburn\b'
+      push:
+        - meta_scope: entity.name.function.burn.serp
+        - match: '\b{{number_positive_integer}}\b'
+          scope: variable.parameter.serp
+          pop: true
+        - include: invalid_not_spaces
+    - match: '(?i)\b{{xs_library}}\b'
+      push:
+        - meta_scope: support.constant.xslibrary.serp
+        - match: '{{number_general}}'
+          scope: constant.numeric.fraction.serp
+          pop: true
+        - include: invalid_not_spaces
+
+  options:
+    - meta_scope: keyword.set.serp
+    - match: '(?i)\b(acelib|adf|alb|arr
+      |bc|blockdt|bralib
+      |ccmaxiter|ccmaxpop|cfe|coefpara|comfile|confi|cpop|csw
+      |declib|delnu|depout|dfsol|dynsrc|dt
+      |ecut|egrid|entr
+      |fininitfile|fissh|forcedt|fsp|fum
+      |gbuf|gcu|gcut
+      |his
+      |impl|inftrk|inventory|isobra
+      |lost
+      |mcvol|mdep|micro|memfrac|minxs|mvol
+      |nbuf|nfg|nfylib|ngamma|nphys|nps
+      |opti|outp
+      |pdatadir|poi|pop|power|powdens|ppid|ppw|printm
+      |relfactor|rfr|rfw|root|runtime
+      |savesrc|seed|sie|spd|sfylib
+      |title|tcut|tpa|transnorm|trc
+      |ures|usym
+      |xsplot)\b'
+      scope: entity.name.function.serp
+      pop: true
+    - match: '(?i)\b(bumode|fpcut|pcc|xscalc)\b'
+      scope: entity.name.function.serp
+      pop: true
+    - match: '(?i)\bsym\b'
+      scope: invalid.deprecated.serp
+      pop: true
+
+  pin:
+    - meta_scope: keyword.pin.serp
+    - match: '(?i)\bpin\s+({{word}})\b'
+      captures:
+        1: storage.type.universe.serp
+    - match: '(?i)\bvoid\s+({{number_general}})'
+      captures:
+        1: entity.name.function.void.serp
+        2: constant.numeric.radius.serp
+    - match: '(?i)\bfill\b'
+      push:
+      - meta_scope: entity.name.function.fill.serp
+      - match: '({{word}})\s+({{number_general}})'
+        captures:
+          1: storage.type.universe.serp
+          2: constant.numeric.radius.serp
+        pop: true
+    - match: '({{word}})\s+({{number_general}})'
+      captures:
+        1: storage.type.universe.serp
+        2: constant.numeric.radius.serp
+    - match: '\b({{word}})\b'
+      scope: storage.type.universe.serp
+    
+
+  surface:
+    - meta_scope: keyword.surf.serp
+      # planes
+    - match: '(?i)\b(px|py|pz)\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\bplane\b'
+      scope: entity.name.function.serp
+      # second-order quadratic surfaces
+    - match: '(?i)\b(cylx|cyly|cylz|cyl)\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\bcylv\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\bsph\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\bcone\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\b(quadratic)\b'
+      scope: entity.name.function.serp
+      # non-quadratic surfaces
+    - match: '(?i)\binf\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\b(torx|tory|torz)\b'
+      scope: entity.name.function.serp
+      # regular prisms
+    - match: '(?i)\bsqc\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\brect\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\b(hexxc|hexyc)\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\b(hexxprism|hexyprism)\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\bocta\b'
+      scope: entity.name.function.serp
+    - match: '(?i)\bdode\b'
+      scope: entity.name.function.serp
+      # 3D polyhedra
+    - match: '(?i)\b(cube|cuboid|ppd)\b'
+      scope: entity.name.function.serp
+      # other derived surfaces
+    - match: '(?i)\b(pad|cross|gcross)\b'
+      scope: entity.name.function.serp
+      # user-defined surface
+    - match: '(?i)\buser\b'
+      scope: entity.name.function.serp
+    - include: numbers
+
+  thermal_scattering:
+    - meta_scope: keyword.therm.serp
+    - match: '(?i)\btherm\s+({{word}})\s+{{thermal_library}}\b'
+      captures:
+        1: support.constant.library_name.serp
+        2: support.constant.xslibrary.nuclide.serp
+        3: support.constant.xslibrary.library_provider.serp
+        4: support.constant.xslibrary.library_version.serp
+        5: support.constant.xslibrary.temperature.serp
+
+  numbers:
+    - match: '{{number_general}}'
+      scope: constant.numeric.serp
+    #- match: '\b(-)?[0-9.]+\b'
+
+  strings:
+    # Strings begin and end with quotes, and use backslashes as an escape
+    # character.
+    - match: '"'
+      scope: punctuation.definition.string.begin.serp
+      push: inside_string
+
+  inside_string:
+    - meta_include_prototype: false
+    - meta_scope: string.quoted.double.serp
+    - match: '\.'
+      scope: constant.character.escape.serp
+    - match: '"'
+      scope: punctuation.definition.string.end.serp
+      pop: true
+
+  comments:
+    # Serpent sccepts C style comments between /* and */.
+    # Alternatively, a '%' starts a single line comment.
+    - match: ^/\* =(\s*.*?)\s*= \*/$\n?
+      scope: comment.block.c
+      captures:
+        1: meta.toc-list.banner.block.c
+    - match: /\*
+      scope: punctuation.definition.comment.c
+      push:
+        - meta_scope: comment.block.c
+        - match: \*/
+          scope: punctuation.definition.comment.c
+          pop: true
+    - match: \*/(?!\*)
+      scope: invalid.illegal.stray-comment-end.c
+    - match: '%'
+      scope: punctuation.definition.comment.serp
+      push:
+        # This is an anonymous context push for brevity.
+        - meta_scope: comment.line.comment_line.serp
+        - match: $\n?
+          pop: true
+
+  find_keyword:
+    - match: \s   # eat spaces
+    - match: \n   # eat new lines
+    - match: '(?i)(?=\b{{reserved_keys}}\b)'
+      pop: true
+
+  invalid_not_spaces:
+    - match: '\S'
+      scope: invalid.illegal.serp
